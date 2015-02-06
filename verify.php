@@ -3,6 +3,8 @@ function verifyEmail($toemail, $fromemail, $getdetails = false){
 	$email_arr = explode("@", $toemail);
 	$domain = array_slice($email_arr, -1);
 	$domain = $domain[0];
+	$result = '';
+	$details = '';
 
 	// Trim [ and ] from beginning and end of domain string, respectively
 	$domain = ltrim($domain, "[");
@@ -41,9 +43,9 @@ function verifyEmail($toemail, $fromemail, $getdetails = false){
 	
 	$connect = @fsockopen($mx_ip, 25); 
 	if($connect){ 
-		if(preg_match("/^220/i", $out = fgets($connect, 1024))){
+		if(preg_match("/^220/i", $out = fgets($connect, 1024), $tmp_op_arry)){
 			fputs ($connect , "HELO $mx_ip\r\n"); 
-			$out = fgets ($connect, 1024);
+			$out .= fgets ($connect, 1024);
 			$details .= $out."\n";
  
 			fputs ($connect , "MAIL FROM: <$fromemail>\r\n"); 
@@ -63,6 +65,8 @@ function verifyEmail($toemail, $fromemail, $getdetails = false){
 			else{
 				$result = "valid";
 			}
+		} else {
+			$result = 'invalid';
 		} 
 	}
 	else{
